@@ -12,9 +12,7 @@ let markedWinners = [];
 // Take a single string and construct a BINGO board from it
 function constructBoard(string) {
     let board = [];
-    //console.log(string);
     let separatedLine = string.split(' ');
-    //console.log(separatedLine.length);
 
     let line = [];
     for (let i = 0; i < separatedLine.length; i++) {
@@ -50,8 +48,6 @@ function callNumber(number, boardlist) {
             if (unspecLineOnBoard(boardlist[i])) {
                 winner = i;
                 markedWinners.push(winner);
-                console.log(winner);
-                console.log(boardlist[i]);
             }
         }
     }
@@ -115,8 +111,6 @@ function initCalculation(getFirst = true) {
     for (let i = 0; i < inputB.length; i++) {
         boardlist.push(constructBoard(inputB[i]));
     }
-
-    console.log(boardlist[54]);
 
     // Call out numbers
     for (let i = 0; i < input.length; i++) {
