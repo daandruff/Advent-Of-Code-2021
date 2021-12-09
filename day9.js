@@ -19,7 +19,7 @@
                         pos: { x: x, y: y },
                         level: point,
                         risk: point + 1,
-                        basin: []
+                        basin: [{ x: x, y: y }]
                     });
                 }
             });
@@ -28,5 +28,74 @@
         return lowPointList;
     }
 
-    console.log("Sum of risk levels on found low points: " + findLowPoints(df).reduce((s, v) => s += v.risk, 0));
+    function pointIn(point, basin) {     
+        for (let i = 0; i < basin.length; i++) {
+            if (basin[i].x == point.x && basin[i].y == point.y) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function mapBasin(point, map) {
+        let allFound = false
+
+        while (!allFound) {
+            allFound = true;
+
+            point.basin.forEach(l => {
+                if (l.y > 0) {
+                    if (map[l.y-1][l.x] !== 9 && !pointIn({x: l.x, y: l.y-1}, point.basin)) {
+                        point.basin.push({x: l.x, y: l.y-1});
+                        allFound = false;
+                    }
+                }
+                if (l.y < map.length-1) {
+                    if (map[l.y+1][l.x] !== 9 && !pointIn({x: l.x, y: l.y+1}, point.basin)) {
+                        point.basin.push({x: l.x, y: l.y+1});
+                        allFound = false;
+                    }
+                }
+                if (l.x > 0) {
+                    if (map[l.y][l.x-1] !== 9 && !pointIn({x: l.x-1, y: l.y}, point.basin)) {
+                        point.basin.push({x: l.x-1, y: l.y});
+                        allFound = false;
+                    }
+                }
+                if (l.x < map[0].length-1) {
+                    if (map[l.y][l.x+1] !== 9 && !pointIn({x: l.x+1, y: l.y}, point.basin)) {
+                        point.basin.push({x: l.x+1, y: l.y});
+                        allFound = false;
+                    }
+                }
+            });
+        }
+
+        return point;
+    }
+
+    function mapAllBasins(points, map) {
+        points.forEach(point => {
+            point = mapBasin(point, map);
+        });
+
+        return points;
+    }
+
+    function multiplyLargestBasins(points) {
+        let sortedPoints = points.sort((a, b) => {
+            return a.basin.length - b.basin.length;
+        });
+
+        let l = sortedPoints.length;
+        return (sortedPoints[l-1].basin.length * sortedPoints[l-2].basin.length * sortedPoints[l-3].basin.length);
+    }
+
+    let lowPoints = findLowPoints(df)
+    console.log("Sum of risk levels on found low points: " + lowPoints.reduce((s, v) => s += v.risk, 0));
+
+    lowPoints = mapAllBasins(lowPoints, df);
+    console.log("The three largest basins multiplies to: " + multiplyLargestBasins(lowPoints));
+
 })();
