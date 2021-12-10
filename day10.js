@@ -3,9 +3,9 @@
     const openers = "([{<";
     const closers = ")]}>";
 
-    function validateLine(line) {
+    function validateLine(line, autocomplete = false) {
         let openChunks = [];
-        let illegalChar = '';
+        let illegalChar = false;
 
         for (const char of [...line]) {
             let error = false;
@@ -19,41 +19,79 @@
                     } else {
                         illegalChar = char;
                         error = ('Error: Expected ' + [...closers][openers.indexOf(openChunks.at(-1))] + ' but got ' + char);
+                        break;
                     }
                 }
             }
-
-            // Handle errors
-            if (error) {
-                console.log(error);
-                break;
-            }
         };
 
-        switch (illegalChar) {
-            case ')':
-                return 3;
-            case ']':
-                return 57;
-            case '}':
-                return 1197;
-            case '>':
-                return 25137;
-            default:
-                return 0;
+        if (!autocomplete) {
+            switch (illegalChar) {
+                case ')':
+                    return 3;
+                case ']':
+                    return 57;
+                case '}':
+                    return 1197;
+                case '>':
+                    return 25137;
+                default:
+                    return 0;
+            }
+        } else {
+            if (!illegalChar) {
+                let score = 0;
+                while (openChunks.length) {
+                    score *= 5;
+                    switch (openChunks.pop()) {
+                        case '(':
+                            score += 1;
+                            break;
+                        case '[':
+                            score += 2;
+                            break;
+                        case '{':
+                            score += 3;
+                            break;
+                        case '<':
+                            score += 4;
+                            break;
+                    }
+                }
+               
+                return score;
+            }
         }
+
+        return 0;
     }
 
     function getCorruptedValue(data) {
         let errorVal = 0;
 
-        data.forEach((line, i) => {
+        data.forEach(line => {
             errorVal += validateLine(line);
         });
 
         console.log('The combined value for all first corrupted characters are: ' + errorVal);
     }
 
+    function getCorrectedValue(data) {
+        let lineScores = [];
+
+        data.forEach(line => {
+            let score = validateLine(line, true);
+            if (score) {
+                lineScores.push(score);
+            }
+        });
+
+        let sortedScores = lineScores.sort((a, b) => { return a - b });
+
+        console.log('The middle score of autocompleted lines is: ' + sortedScores[Math.floor(sortedScores.length/2)]);
+    }
+
     getCorruptedValue(D);
+    getCorrectedValue(D);
 
 })();
