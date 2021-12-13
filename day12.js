@@ -26,21 +26,18 @@ function getPaths(system) {
     let trashedPaths = [];
     let closedPaths = [];
 
-    let test = 0;
-    while(test < 30) {
+    while(openPaths.length) {
         let activePaths = [];
-        //console.log(openPaths);
 
         openPaths.forEach(path => {
             let pointer = path.split(',')[path.split(',').length-1]
-            //console.log(path, pointer);
+
             system[pointer].connections.forEach(connection => {
                 if (connection == "end") {
                     closedPaths.push(path + ",end");
                 } else if (connection == "start") {
                     trashedPaths.push(path + ",start");
                 } else if ((connection.match(/^[a-z]*$/) != null) && path.indexOf(connection) != -1) {
-                    //console.log(path, pointer, path.indexOf(pointer));
                     trashedPaths.push(path + ',' + connection);
                 } else {
                     activePaths.push(path + ',' + connection);
@@ -49,12 +46,9 @@ function getPaths(system) {
         });
 
         openPaths = activePaths;
-        test++;
     }
     
     return { open: openPaths, closed: closedPaths, trashed: trashedPaths };
 }
 
-//console.log(createSystem(d));
-//getPaths(createSystem(d))
-console.log(getPaths(createSystem(d)).closed.length);
+console.log("The number of possible paths while not visiting smaller caves multiple times are: " + getPaths(createSystem(d)).closed.length);
