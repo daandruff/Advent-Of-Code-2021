@@ -21,7 +21,7 @@ function createSystem(data) {
     return caveSystem;
 }
 
-function getPaths(system) {
+function getPaths(system, allowSmallRevisit = false) {
     let openPaths = ["start"];
     let trashedPaths = [];
     let closedPaths = [];
@@ -37,8 +37,16 @@ function getPaths(system) {
                     closedPaths.push(path + ",end");
                 } else if (connection == "start") {
                     trashedPaths.push(path + ",start");
-                } else if ((connection.match(/^[a-z]*$/) != null) && path.indexOf(connection) != -1) {
-                    trashedPaths.push(path + ',' + connection);
+                } else if (connection.match(/^[a-z]*$/) != null) {
+                    if (path.indexOf(connection) != -1) {
+                        if (allowSmallRevisit && path[0] != '*') {
+                            activePaths.push('*' + path + ',' + connection);
+                        } else {
+                            trashedPaths.push(path + ',' + connection);
+                        }
+                    } else {
+                        activePaths.push(path + ',' + connection);
+                    }
                 } else {
                     activePaths.push(path + ',' + connection);
                 }
@@ -51,4 +59,5 @@ function getPaths(system) {
     return { open: openPaths, closed: closedPaths, trashed: trashedPaths };
 }
 
-console.log("The number of possible paths while not visiting smaller caves multiple times are: " + getPaths(createSystem(d)).closed.length);
+console.log("The number of possible paths without smaller cave-revisits are: " + getPaths(createSystem(d)).closed.length);
+console.log("The number of possible paths with only one smaller cave-revisit are: " + getPaths(createSystem(d), true).closed.length);
