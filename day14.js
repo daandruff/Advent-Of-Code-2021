@@ -58,12 +58,8 @@ function countChars(list) {
     }
 
     for (const [k, v] of Object.entries(charList)) {
-        charList[k] = Math.floor(v / 2);
+        charList[k] = Math.ceil(v / 2);
     }
-
-    // First and last character in initial data needs a bit of help... I can't bother to fix it the right way
-    charList['O']++;
-    charList['C']++;
 
     return charList;
 }
